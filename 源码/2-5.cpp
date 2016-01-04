@@ -9,9 +9,9 @@ int fun(int xBeg, int xEnd, int yBeg, int yEnd)
 {
     int xMid = xBeg + ( xEnd - xBeg ) / 2,
         yMid = yBeg + ( yEnd - yBeg ) / 2,
-        lMid = xMid - xBeg + yMid - yBeg + 2; //x,y数组分半之后的总长度
+        lMid = xMid - xBeg + yMid - yBeg + 2; //X左段和Y左段元素个数合计
     if (xBeg > xEnd)
-        return y[yBeg + k - 1];
+        return y[yBeg + k - 1]; //X序列为空时，直接返回Y序列的第k小元素
     if (yBeg > yEnd)
         return x[xBeg + k - 1];
 
