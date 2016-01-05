@@ -1,0 +1,638 @@
+// 有重复元素排列
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define TRUE 1
+#define FALSE 0
+
+int total = 0;
+inline void Swap(char &a, char &b)
+{
+    char temp = a;
+    a = b;
+    b = temp;
+}
+int isRepeat (char str[], int a, int b)
+{
+    for (int i = a; i < b; i++) {
+        if (str[i] == str[b])
+            return FALSE;
+    }
+    return TRUE;
+}
+int Perm(char list[], int k, int m)
+{
+
+    //产生list[k:m]的所有排列
+
+    if (k == m) {
+        for (int i = 0; i <= m; i++) {
+             printf("%c",list[i]);
+        }
+        printf("\n");
+        total ++;
+    }
+    else {
+        for (int i = k; i <= m; i++) {
+            if (isRepeat(list, k, i)) {
+                Swap(list[k], list[i]);
+                Perm(list, k+1, m);
+                Swap(list[k],list[i]);
+            }
+
+        }
+    }
+    return total;
+}
+
+int main()
+{
+    int LENGTH = 0,i;
+    scanf("%d\n",&LENGTH); //元素个数： >=1 && <=15
+    char str[LENGTH];
+    for (i = 0; i < LENGTH; i++) {
+        scanf("%c",&str[i]);
+    }
+    printf("%d\n",Perm(str,0,LENGTH-1));
+    return 0;
+}
+
+// 整数因子分解
+
+#include <stdio.h>
+#include <stdlib.h>
+int countNum = 0;
+void count (int num)
+{
+    int i;
+    for (i = num - 1; i > 1; i--) {
+        if (num % i == 0)  {
+            countNum ++;
+            count(num/i);
+        }
+    }
+}
+int main()
+{
+    int num;
+    scanf("%d",&num);
+    if(num != 0) {
+        count(num);
+        printf("%d\n",countNum+1);
+    }
+    return 0;
+}
+
+// 找第k小
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAXSIZE 10000
+
+int x[MAXSIZE],y[MAXSIZE],k;
+
+int fun(int xBeg, int xEnd, int yBeg, int yEnd)
+{
+    int xMid = xBeg + ( xEnd - xBeg ) / 2,
+        yMid = yBeg + ( yEnd - yBeg ) / 2,
+        lMid = xMid - xBeg + yMid - yBeg + 2; //X左段和Y左段元素个数合计
+    if (xBeg > xEnd)
+        return y[yBeg + k - 1]; //X序列为空时，直接返回Y序列的第k小元素
+    if (yBeg > yEnd)
+        return x[xBeg + k - 1];
+
+    if (x[xMid] < y[yMid]) {
+        if (k < lMid) {
+            return fun(xBeg, xEnd, yBeg, yMid - 1);
+        }
+        else {
+            k = k - ( xMid - xBeg + 1);
+            return fun(xMid + 1, xEnd, yBeg, yEnd);
+        }
+    }
+    else {
+        if (k < lMid) {
+            return fun(xBeg, xMid - 1, yBeg, yEnd);
+        }
+        else {
+             k = k - (yMid - yBeg + 1);
+            return fun(xBeg, xEnd, yMid + 1, yEnd);
+        }
+    }
+
+
+}
+
+int main()
+{
+    int m,n,i;
+    scanf("%d %d %d",&m,&n,&k);
+    for (i = 0; i < m; i++) {
+        scanf("%d",&x[i]);
+    }
+    for (i = 0; i < n; i++) {
+        scanf("%d",&y[i]);
+    }
+    printf("%d",fun(0,m-1,0,n-1));
+    return 0;
+}
+
+// 整数划分拓展问题
+#include <stdio.h>
+
+int Odd(int i,int j);
+int Even(int i, int j);
+//Even(I,J)表示I划分为J个正偶数的划分数.
+int Even(int i,int j)
+{
+    if (j > i || j <= 0)
+        return 0;
+    if ((i == 1 && j == 1) || (i == 2 && j == 2))
+        return 0;
+    if (i == 2 && j == 1)
+        return 1;
+    return Odd(i-j,j); //每个偶加数减掉1变为奇加数
+}
+//Odd(I,J)表示I划分为J个正奇数的划分数
+int Odd(int i, int j)
+{
+
+    if ((i == 1 && j == 1)||(i == 2 && j == 2))
+        return 1;
+    if (i == 2 && j == 1)
+        return 0;
+    if (j > i || j < 0)
+        return 0;
+    return Odd(i-1,j-1) + Even(i-j,j); //加数含1的方式数 + 加数不含1的方式数
+}
+
+
+int huafen1(int n, int m)
+{
+    if (m < 1 || n < 1)
+        return 0;
+    if (m == 1 || n == 1)
+        return 1;
+    if (m > n)
+        return huafen1(n,n);
+    if (m == n) {
+        return 1 + huafen1(n,m-1);
+    }
+    return huafen1(n,m-1) + huafen1(n-m,m);
+
+}
+int main()
+{
+    int n,m;
+    int i = 0,res1 = 0, res2 = 0;
+    scanf("%d %d",&n,&m);
+    res1 = huafen1(n,m);
+    for (i = 1; i <= n; i++) {
+        res2 += Odd(n,i);
+    }
+    printf("%d %d %d %d", res1,res1,res2,res2);
+    return 0;
+}
+
+// 最长上升子序列
+#include <stdio.h>
+
+//最长上升子串
+int longSub(int *a, int n)
+{
+    int *b = new int[n];
+    int maxSub = 1;
+    b[0] = 1;
+    for (int i = 1; i < n; i++) {
+        b[i] = 1;
+        for (int j = 0; j < i; j++) {
+            if (a[i] > a[j] && (b[j] + 1) > b[i]) {
+                b[i] = b[j] + 1;
+            }
+        }
+    }
+
+    for (int i = 0; i < n; i++) {
+        if (b[i] > maxSub) {
+            maxSub = b[i];
+        }
+    }
+    return maxSub;
+}
+
+int main()
+{
+    int n;
+    scanf("%d",&n);
+    while(n != 0) {
+        int *arr = new int[n];
+        for (int i = 0; i < n; i++) {
+            scanf("%d",&arr[i]);
+        }
+        printf("%d\n",longSub(arr,n));
+        scanf("%d",&n);
+    }
+    return 0;
+}
+
+// 最长上升子字符串
+/# include <iostream>
+# include <string>
+
+using namespace std;
+string str1, str2;
+
+int f( int m, int n) {
+    if ((m < 0) || (n < 0) || str1[m] != str2[n]) {
+        return 0;
+    } else {
+        return f(m - 1, n - 1) + 1;
+    }
+}
+
+int main() {
+    int sum = 0, seat;
+    cin >> str1;
+    cin >> str2;
+    for (int i = str1.length() - 1; i >= 0; i--)
+        for (int j = str2.length() - 1; j >= 0; j--)
+            if (f(i, j) >= sum) {
+                sum = f(i, j);
+                seat = i;
+            }
+    cout << sum << endl;
+    cout << str1.substr(seat - sum + 1, sum) << endl;
+}
+
+
+
+// 数字三角
+import java.util.Scanner;
+
+/**
+ * Created by xiami on 2015/11/15.
+ */
+public class Main {
+    public static void main(String[] args) {
+        Scanner scan = new Scanner(System.in);
+        int n = scan.nextInt();
+        int[][] arr = new int[n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j <= i; j++) {
+                arr[i][j] = scan.nextInt();
+            }
+        }
+        if (n == 1) {
+            System.out.println(arr[0][0]);
+            System.out.println(arr[0][0]);
+            return;
+        } else if (n == 2) {
+            int max = arr[1][0] > arr[1][1] ? arr[1][0] : arr[1][1];
+            System.out.println(arr[0][0] + max);
+            System.out.println(arr[0][0] + " " + max);
+            return;
+        }
+        StringBuilder sb[][] = new StringBuilder[n][n];
+
+        for (int i = 0; i < n; i++) {
+            sb[n - 1][i] = new StringBuilder().append(arr[n - 1][i]).append(' ');
+        }
+
+        for (int i = n - 2; i >= 0; i--) {
+            for (int j = 0; j <= i; j++) {
+                if (arr[i + 1][j] > arr[i + 1][j + 1]) {
+                    sb[i][j] = new StringBuilder().append(arr[i][j]).append(' ').append(sb[i + 1][j]);
+                    arr[i][j] += arr[i + 1][j];
+                } else {
+                    sb[i][j] = new StringBuilder().append(arr[i][j]).append(' ').append(sb[i + 1][j + 1]);
+                    arr[i][j] += arr[i + 1][j + 1];
+                }
+            }
+        }
+        System.out.println(arr[0][0]);
+        System.out.println(sb[0][0].toString());
+    }
+}
+
+// 不能移动石子合并
+#include <iostream>
+
+using namespace std;
+int m[100][100];
+
+int sum_a(int *a,int i,int j){
+    int sum = 0,k;
+    if(i > j)
+        return 0;
+    for(k = i; k <= j; k++){
+        sum += a[k];
+    }
+    return sum;
+}
+
+void combin_stone1(int *a,int n){
+    //最低得分
+    for (int i = n-2; i >= 0; i--){
+        for (int j = i + 1; j < n; j++){
+            int temp = m[i][i]+m[i+1][j];
+            for (int k = i; k < j; k++){
+                temp = min((m[i][k] + m[k+1][j]),temp);
+            }
+            m[i][j] = temp + sum_a(a,i,j);
+        }
+    }
+
+    cout << m[0][n-1];
+
+    //最高得分
+    for(int i = n-2; i >= 0; i--){
+        for(int j = i + 1; j < n; j++){
+            int temp = m[i][i] + m[i+1][j];
+            for(int k = i; k < j; k++){
+                    temp = max(temp,m[i][k]+m[k+1][j]);
+            }
+            m[i][j] = temp + sum_a(a,i,j);
+        }
+    }
+    cout<<" " << m[0][n-1] << endl;
+}
+
+void combin_stone2(int *a,int n) {
+    int **m=new int*[2*n-1],*b=new int[2*n-1],i,j,k,temp,n1;
+    n1=2*n-1;
+    for(i=0;i<n;i++) b[i]=a[i];
+    for(i=n;i<n1;i++) b[i]=a[i-n];
+    for(i=0;i<n1;i++) m[i]=new int[n1];
+    for(i=0;i<n1;i++) m[i][i]=0;
+
+    for(i=n1-2;i>=0;i--){
+        j=i+1;
+        while(j<n1&&j<(n+i)){
+            temp=m[i][i]+m[i+1][j];
+            for(k=i;k<j;k++){
+                if(temp>(m[i][k]+m[k+1][j]))
+                    temp=m[i][k]+m[k+1][j];
+            }
+            m[i][j]=temp+sum_a(b,i,j);
+            j++;
+        }
+    }
+
+    temp=m[0][n-1];
+    for(i=0;i<n;i++){
+        if(temp>m[i][n+i-1]) temp=m[i][n+i-1];
+    }
+    cout<<temp<<" ";
+
+    for(i=n1-2;i>=0;i--){
+        j=i+1;
+        while(j<n1&&j<(n+i)){
+            temp=m[i][i]+m[i+1][j];
+            for(k=i;k<j;k++){
+                if(temp<(m[i][k]+m[k+1][j]))
+                    temp=m[i][k]+m[k+1][j];
+            }
+            m[i][j]=temp+sum_a(b,i,j);
+            j++;
+        }
+    }
+
+    temp=m[0][n-1];
+    for(i=0;i<n;i++){
+        if(temp<m[i][n+i-1])
+            temp=m[i][n+i-1];
+    }
+    cout<<temp<<" ";
+}
+
+int main()
+{
+    int n;
+    cin >> n;
+    int *a = new int[n];
+    for(int i = 0; i < n; i++){
+        cin >> a[i];
+        m[i][i] = 0;
+    }
+
+    combin_stone1(a,n);
+    combin_stone2(a,n);
+    return 0;
+}
+
+// 区间相交
+# include <stdio.h>
+# include <algorithm>
+using namespace std;
+
+struct val //区间
+{
+    int l, r; //左右数值
+}p[50];
+
+bool cmp(struct val a, struct val b)
+{
+    return a.r < b.r;
+}
+
+int main()
+{
+    int n; //区间数
+    scanf("%d",&n);
+
+    //输入区间，左小右大
+    for (int i = 0; i < n; i++) {
+        int l,r;
+        scanf("%d%d",&l,&r);
+        if (l <= r) {
+            p[i].l = l;
+            p[i].r = r;
+        } else {
+            p[i].l = r;
+            p[i].r = l;
+        }
+    }
+
+    sort(p,p+n,cmp); //按右端点升序排列
+
+    int cnt = 1, //最大相容数目
+        limit = p[0].r;
+    for (int i = 1; i < n; i++) {
+        if (p[i].l >= limit) { //贪心选择满足相容性且终点最小的区间
+            cnt ++;
+            limit = p[i].r;
+        }
+    }
+    cnt = n - cnt;
+    printf("%d",cnt);
+    return 0;
+}
+// 可移动石子合并
+#include <iostream>
+#include <algorithm>
+#include <cstdio>
+#include <cstring>
+#include <queue>
+#include <vector>
+#define REP(i, n) for(int i = 0; i < (n); ++i)
+#define FOR(i, a, b) for(int i = (a); i <= (b); ++i)
+using namespace std;
+const int N = 110;
+int n, m, a[N];
+
+priority_queue<int, vector<int>, greater<int> > qmi;
+priority_queue<int, vector<int>, less<int> >qmx;
+
+int main()
+{
+
+    int n, k;
+    while(scanf("%d%d", &n, &k) > 0) {
+        REP(i, n) {
+            scanf("%d", a + i);
+            qmi.push(a[i]);
+            qmx.push(a[i]);
+        }
+
+        int ans = 0;
+        if(n > k) {
+            int t = (n - k) % (k - 1);
+            if(t) {
+                while(!qmi.empty() && t >= 0) {
+                    ans += qmi.top();
+                    qmi.pop();
+                    --t;
+                }
+                if(!qmi.empty()) qmi.push(ans);
+            }
+        }
+        while(true) {
+            int a = 0;
+            for(int i = 0; !qmi.empty() && i < k; ++i) {
+                a += qmi.top();
+                qmi.pop();
+            }
+            ans += a;
+            if(qmi.empty()) break;
+            qmi.push(a);
+        }
+        printf("%d ", ans);
+
+        ans = 0;
+        while(true) {
+            int a = 0;
+            for(int i = 0; i < 2 && !qmx.empty(); ++i) {
+                a += qmx.top();
+                qmx.pop();
+            }
+            ans += a;
+            if(qmx.empty()) break;
+            qmx.push(a);
+        }
+        printf("%d\n", ans);
+    }
+    return 0;
+}
+
+// 子集合
+#include <iostream>
+#include<math.h>
+#include<stdlib.h>
+using namespace std;
+
+int n, c;
+int sum = 0;
+int leaf = 0;
+
+void getSubSum(int i,int *ary,int *x){
+
+    if(i >= n){
+        leaf++;                        //叶子节点+1
+        if(sum == c) {
+            for(int i = 0; i < n; i++){
+                if(x[i]==1)
+                    cout<<ary[i]<<" ";
+            }
+            exit(0);                //只输出第一个解
+        }
+        if(leaf == pow(2,n))
+            cout<<"No Solution"<<endl;
+        return;
+    }
+
+    x[i] = 1;                                  //遍历左子树
+    sum += ary[i];
+    getSubSum(i+1,ary,x);
+    sum -= ary[i];
+    x[i] = 0;                                   //遍历右子树
+    getSubSum(i+1,ary,x);
+}
+
+
+int main()
+{
+    cin >> n >> c;
+    int *x = new int[n];           //由于只输出遇到的第一个解，所以此处只设置一个解向量
+    int *a = new int[n];
+    for (int i = 0; i < n; i++) {
+        cin >> a[i];
+    }
+    getSubSum(0,a,x);
+    return 0;
+}
+
+// 工作分配
+#include <iostream>
+
+using namespace std;
+
+int n,           //工作量n
+    cost = 0,            //总花费
+    x[100] = {0},        //X[j]，第j号工作是否被分配,0表示没有，1表示有
+    worker1[100],worker2[100],        //表示第1个工作分配给第2个人，第2个工作分配给第1个人，第3个工作分配给第3个人
+    c[100][100]; //c[i][j] i号工人完成j号工作的价钱
+
+//sum：费用总和
+//i：第i号工人
+void work(int i, int sum)
+{
+    if (i > n && sum < cost) {
+        cost = sum;
+        for (int i = 1; i <= n; i++) {
+            worker2[i] = worker1[i];
+        }
+        return;
+    }
+    for (int j = 1; j <= n; j++) {
+        if (x[j] == 0) {
+            x[j] = i;
+            worker1[i] = j; //第i个人的工作为j;
+            //cout << "工作" << j << "被分给第" << i <<"人" << endl;
+            work(i+1, sum + c[i][j]);
+            x[j] = 0;
+        }
+    }
+}
+
+int main()
+{
+    cin >> n;
+
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= n; j++) {
+            cin >> c[i][j];
+        }
+        cost += c[i][i];
+        worker2[i] = i;
+    }
+    work(1,0);
+    cout << cost << endl;
+    for (int i = 1; i<=n ; i++) {
+        cout << worker2[i] << " ";
+    }
+
+    return 0;
+}
+
+// 多级最佳调度
